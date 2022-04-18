@@ -1,0 +1,11 @@
+slave_generates_own_functions_for_FP true
+slave_generates_own_functions_for_CP true
+solve_original_centering_problem false
+number_FP original 4
+number_CP original 0
+global_time_limit 3000
+random_walk_type hit_run
+objective_improvement_percentage_CP 0.001
+objective_improvement_percentage_FP 0.001
+objective_improvement_coefficient_FP 0.1
+objective_improvement_coefficient_CP 0.1

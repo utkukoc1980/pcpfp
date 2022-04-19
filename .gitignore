@@ -1,0 +1,8 @@
+
+*.o
+zzz_SLAVE0_signal.out
+*.in
+*.out
+slave_FP_id_1
+pcpfp
+slave_log_1.txt

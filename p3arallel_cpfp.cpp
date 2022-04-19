@@ -3,10 +3,10 @@
 
 #include "p2_definitions.h"
 #include <sys/stat.h>
-//#include <IpTNLP.hpp>
+#include <IpTNLP.hpp>
 #include <sys/resource.h>
-//#include <OsiConicSolverInterface.hpp>
-//#include <OsiIpoptSolverInterface.hpp>
+#include <OsiConicSolverInterface.hpp>
+#include <OsiIpoptSolverInterface.hpp>
 //#include "start_point_generator6.h"
 
 #define  history_size_limit_l 2000
@@ -377,7 +377,10 @@ int master_iop_AC_needs_to_calculated = 0;
                                              *    1, needs to be calculated
                                              *    2, is being distributed
 											 **/
-											
+								
+//OsiIpoptSolverInterface *ipopt_solver;
+OsiConicSolverInterface * ipopt_solver;
+
 My_solution latest_lp_opt_sent_to_slaves;
 double latest_updated_fp_objective_in_slave = 1e31;
 											
@@ -442,7 +445,7 @@ bool FP_iterate_use_time_limit( int current_iteration_number, double time );
 int time_limit_master_checker(int  reset_count_final);
 int min_iterlim_master_checker(int  reset_count_final);
 
-//OsiIpoptSolverInterface *ipopt_solver;
+
 
 my_signaler signaler;
 
@@ -3323,7 +3326,7 @@ int slave_FP_v4(cpfp_executable &runner, My_solution &arg_current_lp_optimum_at_
 }
 int slave_run ( int argc, char* argv[], string argfilename ="__NULL" ){
 
-	//DEBON();
+	DEBON();
 // 	cout << " line " <<__LINE__ <<endl;
 
 // 	struct rlimit rl;
@@ -3346,7 +3349,7 @@ int slave_run ( int argc, char* argv[], string argfilename ="__NULL" ){
 	
     my_runner.set_seed ( slave_seed );
 	//DEBON();
-    if ( my_runner.initialize(solver_type) == 1 ) {
+	if ( my_runner.initialize(solver_type,ipopt_solver) == 1 ) {
 		objective_improvement_coefficient_FP = 1;
 		objective_improvement_coefficient_CP = 1;
         
@@ -4204,7 +4207,7 @@ int master_run ( int argc, char* argv[], string argfilename ="__NULL" ){
     cpfp_executable my_runner ( argfilename );
     my_runner.set_seed ( my_default_seed );
 
-    if ( my_runner.initialize(solver_type) == 1 ) {
+    if ( my_runner.initialize(solver_type,ipopt_solver) == 1 ) {
 		objective_improvement_coefficient_FP = 1;
 		objective_improvement_coefficient_CP = 1;
 		// galiba Cout da yazanlar yanlis
@@ -4777,7 +4780,7 @@ int serial_run ( int argc, char* argv[], string argfilename ="__NULL" ){
     cpfp_executable my_runner ( argfilename );
     my_runner.set_seed ( my_default_seed );
 
-    if ( my_runner.initialize(solver_type) == 1 ) {
+	if ( my_runner.initialize(solver_type,ipopt_solver) == 1 ) {
 
 		objective_improvement_coefficient_FP = 1;
 		objective_improvement_coefficient_CP = 1;
@@ -5015,7 +5018,7 @@ int pre_run ( int argc, char *argv[], string &argfilename ){
     
     signaler = my_signaler(MY_UNIQ_FILENAME, MY_SLAVE_ID_from_input, WORLD_SIZE_from_input);
 	signaler.clean_files();
-	signaler.send_signal_as_tag_and_number(0,99,0);
+	IFSLAVE signaler.send_signal_as_tag_and_number(0,99,0);
 	//abort();
     if(!PWR_file_set){
         PWR_param_file << "params/pp-param";
@@ -5290,7 +5293,7 @@ int serial_FP_run_tester( int argc, char *argv[], string argfilename){
 	
 	
 	my_runner.set_seed ( my_seed );
-	if ( my_runner.initialize(solver_type) == 1 ) {
+	if ( my_runner.initialize(solver_type,ipopt_solver) == 1 ) {
 		objective_improvement_coefficient_FP = 1;
 		objective_improvement_coefficient_CP = 1;
         cout << " no problem in initialization" << endl; 
@@ -5846,16 +5849,10 @@ int serial_FP_run_tester( int argc, char *argv[], string argfilename){
 	return 0;
 }
 
+bool using_AC3=true;
 
-int testing(){
-//	OsiIpoptSolverInterface *ipopt_solver = new OsiIpoptSolverInterface();
-//	ipopt_solver.readMps(global_filename);
-	cout << "end of function testing" << endl;
-	
-	return 1;
-}
 int main ( int argc, char *argv[] ){
-	
+	if (using_AC3) ipopt_solver = new OsiIpoptSolverInterface;
 	global_break_timer.start();
     global_time.reset();
 
@@ -5869,9 +5866,9 @@ int main ( int argc, char *argv[] ){
 
     IFMASTER global_time.start();
     string filename;
-	//DEBON();
+	DEBON();
     pre_run ( argc, argv, filename );
-	//DEBON("pre_run completed");
+	DEBON("pre_run completed");
 	if (!file_exists(global_filename)){
 		DEBON("file does not exist");
 		IFMASTER 
@@ -5882,20 +5879,19 @@ int main ( int argc, char *argv[] ){
 		#endif
 		return -1;
 	}
-	int res = testing();
-	
+
     IFMASTER {
         type_dist_for_CP.print();
         type_dist_for_FP.print();
 		cout << " max_time_limit: " <<max_time_limit <<endl;
     }
-    //DEBON();
+    DEBON();
     //DEBON()
     if ( signaler.get_MY_WORLD_SIZE()==1 ) {
         cout << "running serial" << endl;
         serial_FP_run_tester ( argc,argv, filename );
     } else {
-		//DEBON();
+		DEBON();
         IFMASTER master_run ( argc, argv,filename );
         IFSLAVE  slave_run ( argc, argv,filename );
     }

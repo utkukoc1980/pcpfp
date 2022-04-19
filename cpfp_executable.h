@@ -252,7 +252,7 @@ class cpfp_executable{
 public:
     int original_objective_direction;
 
-    int  initialize(int solver_type = 2); 
+    int  initialize(int solver_type = 2, OsiSolverInterface* mips = nullptr); 
                         /** solver type = 1 use CLP, = 2 use Cplex  
                          * returns 1 objective improvent is multiple of 1,
 	                    *  i.e., all objective coefficients are integer

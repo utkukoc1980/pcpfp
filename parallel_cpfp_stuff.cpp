@@ -1,6 +1,6 @@
 #include "parallel_cpfp_stuff.h"
 
-//#define WRITE_IN
+#define WRITE_IN
   
 #ifdef USING_MPI
 	int EASY_SEND_AND_RECEIVE::receive_blocking_signal_as_tag_and_number(int source){

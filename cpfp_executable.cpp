@@ -344,114 +344,10 @@ cpfp_executable::cpfp_executable ( string arg_filename, unsigned int seedx ) :fi
 
 }
 
-// int cpfp_executable::initialize(OsiSolverInterface* mips, string filename2){
-// 	mips->messageHandler()->setLogLevel ( 0 );
-// 	mips->setHintParam ( OsiDoDualInResolve );
-// 	const char *f_name_lp = filename2.c_str();
-// 	// 		sampler = bind(sampleNN, placeholders::_1, placeholders::_2, placeholders::_3, seed);
-// 	if ( strcmp ( & ( f_name_lp[strlen ( f_name_lp )-3] ), ".lp" ) == 0 ) {
-// 		mips->readLp ( f_name_lp );
-// 		
-// 	} else {
-// 		if ( strcmp ( & ( f_name_lp[strlen ( f_name_lp )-4] ), ".mps" ) == 0 ) {
-// 			mips->readMps ( f_name_lp );
-// 		} else {
-// 			printf ( "### ERROR: unrecognized file type\n" );
-// 			exit ( 1 );
-// 		}
-// 	}
-// 	int ncols = mips->getNumCols();
-// 	const double * obj = mips->getObjCoefficients();
-// 	
-// 	original_objective_direction = mips->getObjSense();
-// 	// 	const char* col_types = mip->getColType();
-// 	// // 	cout << "col_types " << col_types<< endl;
-// 	// 	cout << "mip->getColType() " << mip->getColType()<< endl;
-// 	// 	cout << "col_types1 " << col_types[1]<< endl;
-// 	// 	cout << "col_types2 " << col_types[2]<< endl;
-// 	
-// 	column_types.resize ( ncols,0 );
-// 	for ( int i = 0; i <ncols; ++i ) {
-// 		
-// 		if ( mip->isBinary ( i ) ) {
-// 			column_types[i] =1;
-// 			fp_status.binary_indices.push_back ( i );
-// 			integer_columns_in_slave.push_back(i);
-// 		} else if ( mip->isIntegerNonBinary ( i ) ) {
-// 			column_types[i] = 2;
-// 			fp_status.general_integer_indices.push_back ( i );
-// 			integer_columns_in_slave.push_back(i);
-// 			
-// 		}
-// 		//cout << "column_types[i]: " << column_types[i]<< endl;
-// 		//cout << "obj[i]: " << obj[i]<< endl;
-// 	}
-// 	
-// 	// 	mip->addCol();
-// 	
-// 	vector<double> original_objective_coefficients;
-// 	
-// 	int retval = 1;
-// 	
-// 	vector<int> indices;
-// 	indices.resize ( ncols );
-// 	for ( int i = 0; i <ncols; ++i ) {
-// 		original_objective_coefficients.push_back ( obj[i] );
-// 		indices[i] = i;
-// 		/** calculating if all objective fucntions are integer or not */
-// 		if ( retval == 1 ) {
-// 			if ( ( ( column_types[i]==0 ) && ( double_inequality ( original_objective_coefficients[i], 0, 1e-6 ) ) ) ) {
-// 				/** continious variable with nonzero objective */
-// 				retval = 0;
-// 			} else if ( !is_integer ( original_objective_coefficients[i] ) ) {
-// 				retval = 0;
-// 			}
-// 		}
-// 	}
-// 	
-// 	const double *lbs = mip->getColLower();
-// 	const double *ubs = mip->getColUpper();
-// 	
-// 	original_lbs.resize(ncols);
-// 	original_ubs.resize(ncols);
-// 	
-// 	for (int i =0;i < ncols;++i){
-// 		original_lbs[i] = lbs[i];
-// 		original_ubs[i] = ubs[i];
-// 		
-// 	}
-// 	
-// 	
-// 	original_objective_function = My_objective_function ( original_objective_coefficients );
-// 	auxilary_objective_function = My_objective_function ( original_objective_coefficients );
-// 	
-// 	index_of_original_objective_cutoff_constraint = mip->getNumRows();
-// 	value_of_original_objective_cutoff_constraint_ub = mip->getInfinity();
-// 	value_of_original_objective_cutoff_constraint_lb = -1 * mip->getInfinity();
-// 	mySerializableRowCut tasd ( indices,original_objective_coefficients,  value_of_original_objective_cutoff_constraint_lb, value_of_original_objective_cutoff_constraint_ub );
-// 	
-// 	CoinPackedVector asd = tasd.generate_CoinPackedVector();
-// 	
-// 	mip->addRow ( asd,tasd.get_lb(),tasd.get_ub() );
-// 	mipCP->addRow ( asd,tasd.get_lb(),tasd.get_ub() );
-// 	extra_mip->addRow ( asd,tasd.get_lb(),tasd.get_ub() );
-// 	
-// 	AC_mip->addRow ( asd,tasd.get_lb(),tasd.get_ub() );
-// 	
-// 	initialized = true;
-// 	initialized_extra = true;
-// 	initialized_mipCP = true;
-// 	initialized_AC_mip = true;
-// 	
-// 	initial_solved = false;
-// 	initial_solved_extra = false;
-// 	initial_solved_mipCP = false;
-// 	initial_solved_AC = false;
-// 	
-// }
 
 
-int  cpfp_executable::initialize(int solver_type)
+
+int  cpfp_executable::initialize(int solver_type, OsiSolverInterface* mips)
 {
 
 
@@ -461,7 +357,9 @@ int  cpfp_executable::initialize(int solver_type)
 		mipCP 		= new OsiClpSolverInterface;
         
         AC_mip      = new OsiClpSolverInterface;
- 
+		
+
+
 // #ifdef USE__CPLEX
 		if (solver_type == 2){
 			mip 		= new OsiCpxSolverInterface;
@@ -508,15 +406,22 @@ int  cpfp_executable::initialize(int solver_type)
 	AC_mip->setHintParam ( OsiDoDualInResolve );
 	
 // 	mip->setHintParam(OsiDoPrimalInResolve);
-
+	if(mips != nullptr){
+		cout << "mips not nullptr" << endl; 
+		//mips = new OsiIpoptSolverInterface;
+	}
+	else {
+		cout <<  "mips IS nullptr" << endl; 
+	}
     const char *f_name_lp = filename.c_str();
 // 		sampler = bind(sampleNN, placeholders::_1, placeholders::_2, placeholders::_3, seed);
+	
     if ( strcmp ( & ( f_name_lp[strlen ( f_name_lp )-3] ), ".lp" ) == 0 ) {
 		mip->readLp ( f_name_lp );
 		extra_mip->readLp ( f_name_lp );
 		mipCP->readLp ( f_name_lp );
         AC_mip->readLp ( f_name_lp );
-		
+
     } else {
         if ( strcmp ( & ( f_name_lp[strlen ( f_name_lp )-4] ), ".mps" ) == 0 ) {
 			mip->readMps ( f_name_lp );
@@ -524,12 +429,13 @@ int  cpfp_executable::initialize(int solver_type)
 			mipCP->readMps ( f_name_lp );
 
             AC_mip->readMps ( f_name_lp );
-			
+
         } else {
             printf ( "### ERROR: unrecognized file type\n" );
             exit ( 1 );
         }
     }
+
 
     ncols = mip->getNumCols();
     //cout << "ncols "  << ncols << endl;
@@ -590,7 +496,6 @@ int  cpfp_executable::initialize(int solver_type)
 	for (int i =0;i < ncols;++i){
 		original_lbs[i] = lbs[i];
 		original_ubs[i] = ubs[i];
-
 	}
 
 
@@ -609,6 +514,29 @@ int  cpfp_executable::initialize(int solver_type)
 	extra_mip->addRow ( asd,tasd.get_lb(),tasd.get_ub() );
 
 	AC_mip->addRow ( asd,tasd.get_lb(),tasd.get_ub() );
+	double *asd2 = new double[AC_mip->getNumCols()];
+	for ( int i = 0; i< AC_mip->getNumCols(); ++i ) {
+		asd2[i] =0;	
+	}
+	AC_mip->setObjective(asd2);
+	
+	if(mips != nullptr){
+		mips = AC_mip;
+
+		mips->initialSolve();
+		const double *s = mips->getColSolution();
+		vector<double> retval;
+		retval.resize ( ncols );
+		cout << " centerL :" ;
+		for ( int i = 0; i <ncols; ++i ) {
+			retval[i]=s[i];
+			cout << s[i] << ", ";
+		}
+		cout << endl ;
+		free(asd2);		
+		
+	}
+
 
     initialized = true;
 	initialized_extra = true;

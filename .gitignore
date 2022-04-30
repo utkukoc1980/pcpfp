@@ -1,0 +1,7 @@
+
+*.o
+*.in
+*.out
+pcpfp
+slave_FP_id_1
+slave_log_1.txt

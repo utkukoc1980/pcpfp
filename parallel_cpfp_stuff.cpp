@@ -44,7 +44,6 @@
 		MPI_Send(&number_tag,1,MPI_INT,destination,TAG_SENDING_SIGNAL, MPI_COMM_WORLD);
 		double_tag = 0;
 		return 0;
-
 	}
 
 	int EASY_SEND_AND_RECEIVE::send_blocking_signal_as_tag_and_double(int tag, double d_number, int destination){
@@ -68,13 +67,12 @@ void EASY_SEND_AND_RECEIVE::print(ostream& out) const{
 	out << "Tag: " << send_recv_tag ;
 	out << " number_tag: " << number_tag;
 	out << " double_tag: " << double_tag << endl;
-
-
 }
+
+
 #else
  double my_signaler::get_double() const {return double_tag;}
  int my_signaler::get_number() const { return number_tag;}
- 
  int my_signaler::get_tag() const {return send_recv_tag;}
  int my_signaler::get_MY_WORLD_SIZE() const {return MY_WORLD_SIZE;}
  int my_signaler::get_MY_SLAVE_ID() const {return MY_SLAVE_ID;}
@@ -245,6 +243,7 @@ int my_signaler::receive_signal_as_tag_and_number(int source, int &flag, ALT1_RE
     
  
 }
+
 
 double my_signaler::receive_signal_as_tag_and_double(int source, int &flag, ALT1_RECV_TYPE RECV_TYPE)
 {

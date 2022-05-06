@@ -551,10 +551,8 @@
 		int number_tag;
 		double double_tag;
 
-
 		vector<MPI_Request> v_request;
 		vector<MPI_Status> v_status;
-
 
         stringstream signal_sender_filename;
         stringstream signal_receiver_filename;
@@ -568,10 +566,7 @@
 		int get_number() const;
 		double get_double() const;
 		void print(std::ostream &out = std::cout) const;
-
-
 	};
-
 
 #endif
 #endif
@@ -696,7 +691,7 @@
         
     };
     
-      class signal{
+	class signal{
         int source; 
         int tag;
         int intval;
@@ -710,6 +705,7 @@
         signal(int s, int t, double d);
         void print();
     };
+	
     class object{
         
         int source; 

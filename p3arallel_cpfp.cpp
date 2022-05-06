@@ -5882,7 +5882,7 @@ int main ( int argc, char *argv[] ){
 		#endif
 		return -1;
 	}
-	int res = testing();
+	//int res = testing();
 	
     IFMASTER {
         type_dist_for_CP.print();

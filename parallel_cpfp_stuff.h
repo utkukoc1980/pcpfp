@@ -574,14 +574,14 @@
 #ifndef MY_SIGNALER_V1
 #define MY_SIGNALER_V1
     
-    class signal;
-    class object;
+    class my_signal;
+    class my_object;
     // the structure of the input_output file system
     class my_signaler{
         Timer ts; 
 		Timer to; 
-        vector<signal> signal_list;
-    	vector<object> object_list;
+        vector<my_signal> signal_list;
+    	vector<my_object> object_list;
         
     	unsigned latest_signal_line;
     	unsigned latest_object_line;
@@ -691,7 +691,7 @@
         
     };
     
-	class signal{
+	class my_signal {
         int source; 
         int tag;
         int intval;
@@ -700,13 +700,13 @@
         bool intmi;
         friend class my_signaler;
       public:
-        signal();
-        signal(int s, int t, int i);
-        signal(int s, int t, double d);
+        my_signal();
+        my_signal(int s, int t, int i);
+        my_signal(int s, int t, double d);
         void print();
     };
 	
-    class object{
+    class my_object {
         
         int source; 
         int tag;
@@ -714,8 +714,8 @@
         bool used; 
         friend class my_signaler;
     public:
-        object();
-        object(int s, int t, string ss);
+        my_object();
+        my_object(int s, int t, string ss);
     };
     
 #endif

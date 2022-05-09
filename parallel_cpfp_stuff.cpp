@@ -130,7 +130,7 @@ int my_signaler::object_check(double _ms)
        //cout << " printing at " << __FILE__ << " and line "<< __LINE__ <<endl; 
        s  >> tsource >> ttag;
        //cout << " printing at " << __FILE__ << " and line "<< __LINE__ << endl; 
-       object ob (stoi(tsource),stoi(ttag),s.str());
+        my_object ob (stoi(tsource),stoi(ttag),s.str());
        //cout << " printing at " << __FILE__ << " and line "<< __LINE__ <<endl; 
        object_list.push_back(ob);
        number_of_new_objects++;
@@ -187,7 +187,7 @@ int my_signaler::signal_check(double _ms){
            double dd = -1;
            stringstream ss(tval);
            ss >> dd;
-           signal sd(stoi(tsource),stoi(ttag),stod(tval));
+            my_signal sd(stoi(tsource),stoi(ttag),stod(tval));
            signal_list.push_back(sd);
 //            cout << "printing sd" <<endl;
 //            sd.print();
@@ -202,7 +202,7 @@ int my_signaler::signal_check(double _ms){
         
        }
        else {
-           signal si(stoi(tsource),stoi(ttag),stoi(tval));
+            my_signal si(stoi(tsource),stoi(ttag),stoi(tval));
            //si.print();
            signal_list.push_back(si);
         
@@ -385,7 +385,7 @@ int my_signaler::receive_signal_i(int source, int tag, int &flag, ALT1_RECV_TYPE
  
 }
 
-void signal::print(){
+void my_signal::print(){
  cout << "source: " << source << " tag: "<< tag << " intval: " <<intval  << " doubleval: " << doubleval << " used: " <<used<< " intmi: "<< intmi <<endl;   
 }
 double my_signaler::receive_signal_d(int source, int tag, int &flag, ALT1_RECV_TYPE RECV_TYPE) // returns -1 if for used messages 
@@ -619,8 +619,8 @@ int my_signaler::check_signal(int source, int tag)
 */
 
 
-object::object(){}
-object::object(int s, int t, std::string ss)
+my_object::my_object(){}
+my_object::my_object(int s, int t, std::string ss)
 {
   source = s;
   tag = t;
@@ -628,11 +628,11 @@ object::object(int s, int t, std::string ss)
   used = false;
  
 }
-signal::signal()
+my_signal::my_signal()
 {
 }
 
-signal::signal(int s, int t, double d)
+my_signal::my_signal(int s, int t, double d)
 {
  source = s;
  tag = t;
@@ -643,7 +643,7 @@ signal::signal(int s, int t, double d)
  
 }
 
-signal::signal(int s, int t, int i)
+my_signal::my_signal(int s, int t, int i)
 {
   source = s;
  tag = t;

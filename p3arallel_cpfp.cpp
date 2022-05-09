@@ -1,6 +1,6 @@
 
 //#define USING_MPI
-
+#include <signal.h>     /* signal, raise, sig_atomic_t */
 #include "p2_definitions.h"
 #include <sys/stat.h>
 //#include <IpTNLP.hpp>
@@ -5854,7 +5854,26 @@ int testing(){
 	
 	return 1;
 }
+
+
+
+sig_atomic_t signaled = 0;
+
+void (*prev_handler)(int);
+
+void my_handler (int param)
+{
+	signaled = 1;
+	cout << "Exitting with param: " << param << endl;
+	prev_handler(param);
+}
+
+
+
 int main ( int argc, char *argv[] ){
+	
+	
+	prev_handler = signal (SIGINT, my_handler);
 	
 	global_break_timer.start();
     global_time.reset();

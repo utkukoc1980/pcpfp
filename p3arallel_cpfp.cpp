@@ -5863,6 +5863,7 @@ void (*prev_handler)(int);
 
 void my_handler (int param)
 {
+	/* please indicate whatever you need to do before exiting via interruption */ 
 	signaled = 1;
 	cout << "Exitting with param: " << param << endl;
 	prev_handler(param);
